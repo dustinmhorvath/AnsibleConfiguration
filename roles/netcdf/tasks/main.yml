@@ -1,0 +1,14 @@
+---
+#- name: Clean yum cache
+#  become: yes
+#  command: yum clean all
+#  register: cache_clean_complete
+
+- name: Install $cdf packages
+#  when: cache_clean_complete|success
+  become: yes
+  yum:
+    name={{item}}
+  with_items:
+    - netcdf
+    - netcdf-devel

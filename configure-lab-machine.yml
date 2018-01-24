@@ -1,0 +1,7 @@
+---
+
+- hosts: 405lab
+  roles:
+    - rstudio
+    - awips-cave
+  sudo: yes

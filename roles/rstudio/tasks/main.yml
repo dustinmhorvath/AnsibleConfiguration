@@ -1,0 +1,28 @@
+---
+- name: Install R packages
+  yum:
+    name={{item}}
+    state=latest
+  with_items:
+    - R
+  register: R_installed
+
+- name: Remove RStudio server
+  yum:
+    state=absent
+    name=rstudio-server.x86_64
+
+- name: Download RStudio package
+  when: R_installed|success
+  get_url:
+    url: https://download1.rstudio.org/rstudio-1.1.383-x86_64.rpm
+    dest: /tmp/rstudio-desktop.rpm
+    mode: 0664
+  register: rstudio_downloaded
+
+- name: Install RStudio
+  when: rstudio_downloaded|success
+  yum:
+    disable_gpg_check=yes
+    state=latest
+    name=/tmp/rstudio-desktop.rpm

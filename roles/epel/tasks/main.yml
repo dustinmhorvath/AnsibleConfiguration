@@ -1,0 +1,7 @@
+---
+- name: Add EPEL repo
+  become: yes
+  yum:
+    name=epel-release
+    state=latest
+  register: epel_installed

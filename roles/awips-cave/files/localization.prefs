@@ -1,0 +1,5 @@
+alertServer=tcp\://localhost\:61998
+eclipse.preferences.version=1
+httpServerAddress=http\://geogprdedexap.cc.ku.edu\:9581/services
+httpServerAddressOptions=http\://geogprdedexap.cc.ku.edu\:9581/services
+siteName=BOU

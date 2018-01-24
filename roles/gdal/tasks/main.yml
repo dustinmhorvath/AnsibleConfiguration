@@ -1,0 +1,16 @@
+---
+- name: Get rpmforge repo
+  yum_repository:
+    name: rpmforge
+    description: RPMforge YUM repo
+    file: external_repos
+    baseurl: http://apt.sw.be/redhat/el7/en/$basearch/rpmforge
+    mirrorlist: http://mirrorlist.repoforge.org/el7/mirrors-rpmforge
+    enabled: no
+
+- name: Install GDAL
+  sudo: yes
+  yum:
+    name: gdal
+    enablerepo: rpmforge
+    state: present

@@ -1,0 +1,60 @@
+---
+- name: Add Awips2 repo
+  become: yes
+  yum_repository:
+    name: awips
+    description: Awips2 cave repo
+    baseurl: https://www.unidata.ucar.edu/repos/yum/awips2/
+    gpgcheck: no
+  register: awips_installed
+
+- name: Add fxalpha group
+  become: yes
+  group:
+    name: fxalpha
+    state: present
+
+- name: Add awips user
+  become: yes
+  user:
+    name: awips
+    state: present
+    groups: fxalpha
+    append: yes
+
+- name: Install special dependencies
+  become: yes
+  yum:
+    name={{item}}
+    state=latest
+  with_items:
+    - mesa-libGLU-devel.x86_64
+    - wgrib.x86_64
+    - wgrib2.x86_64
+    - zlib.x86_64
+
+- name: Install Awips-cave
+  become: yes
+  yum:
+    update_cache=yes
+    enablerepo=awips
+    name={{item}}
+    state=present
+  with_items:
+    - "@awips2-cave"
+  register: cave_installed
+
+- name: Create localization skel path
+  file:
+    path=/etc/skel/caveData/.metadata/.plugins/org.eclipse.core.runtime/.settings
+    state=directory
+  register: awips_skel_created
+
+- name: Copy localization file
+  copy:
+    src: /etc/ansible/roles/awips-cave/files/localization.prefs
+    dest: /etc/skel/caveData/.metadata/.plugins/org.eclipse.core.runtime/.settings/
+    owner: root
+    group: root
+    mode: 0664
+    force: yes
