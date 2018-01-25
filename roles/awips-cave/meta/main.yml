@@ -1,5 +1,0 @@
----
-dependencies:
-  - { role: netcdf }
-  - { role: epel }
-  - { role: gdal }

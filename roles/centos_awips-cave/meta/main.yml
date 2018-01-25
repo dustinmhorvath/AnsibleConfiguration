@@ -1,0 +1,5 @@
+---
+dependencies:
+  - { role: centos_netcdf }
+  - { role: centos_epel }
+  - { role: centos_gdal }
