@@ -1,6 +1,6 @@
 ---
 
-- hosts: testvm
+- hosts: 405lab
   roles:
     - centos_rstudio
 
