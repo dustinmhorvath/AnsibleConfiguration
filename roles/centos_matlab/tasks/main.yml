@@ -1,0 +1,119 @@
+---
+- name: Create smb mounting directory
+  become: yes
+  file:
+    path: /mnt/matlab_smb
+    state: directory
+    mode: 0444
+
+- name: Create iso mounting directory
+  become: yes
+  file:
+    path: /mnt/matlab_iso
+    state: directory
+
+- name: Mount smb share
+  become: yes
+  mount:
+    state=mounted
+    fstype="cifs"
+    path="/mnt/matlab_smb"
+    src="//cfs.home.ku.edu/apps/ITWS/MATLAB/"
+    opts="domain=HOME,username={{ p_username }},password={{ p_password }}"
+  register: smb_mounted
+
+- name: Read license key
+  when: smb_mounted|success
+  command: "cat {{ FILELICENSELOCATION }}"
+  register: read_license_key
+
+- name: Store license key
+  when: read_license_key|success
+  set_fact:
+    file_license_key: "{{ read_license_key.stdout }}"
+
+- name: Mount matlab iso
+  when: smb_mounted|success
+  become: yes
+  mount:
+    state=mounted
+    fstype="iso9660"
+    path="/mnt/matlab_iso"
+    src="/mnt/matlab_smb/R2017a/R2017a_glnxa64_dvd1.iso"
+    opts=ro
+  register: iso_mounted
+
+- name: Create installer template
+  when: iso_mounted|success
+  become: yes
+  copy:
+    src: /mnt/matlab_iso/installer_input.txt
+    dest: /tmp/installer_input.txt
+    remote_src: yes
+    force: yes
+    mode: 0644
+  register: template_copied
+
+- name: Insert installation key path
+  become: yes
+  when: template_copied|success
+  lineinfile:
+    dest: /tmp/installer_input.txt
+    regexp: ".*fileInstallationKey=.*"
+    line: 'fileInstallationKey={{ file_license_key }}'
+
+- name: Insert license path
+  become: yes
+  when: template_copied|success
+  lineinfile:
+    dest: /tmp/installer_input.txt
+    regexp: ".*licensePath=.*"
+    line: 'licensePath={{ NETWORKLICENSEFILE }}'
+
+- name: Auto-agree to license
+  become: yes
+  when: template_copied|success
+  lineinfile:
+    dest: /tmp/installer_input.txt
+    regexp: ".*agreeToLicense=.*"
+    line: 'agreeToLicense=yes'
+
+- name: Enable silent mode
+  become: yes
+  when: template_copied|success
+  lineinfile:
+    dest: /tmp/installer_input.txt
+    regexp: ".*mode=.*"
+    line: 'mode=silent'
+
+- name: Enable modules
+  become: yes
+  when: template_copied|success
+  lineinfile:
+    dest: /tmp/installer_input.txt
+    regexp: ".*{{ item }}*"
+    line: '{{ item }}'
+  with_items:
+    - "product.MATLAB"
+
+- name: Install Matlab
+  become: yes
+  # TODO when here
+  command: /mnt/matlab_iso/install -inputFile /tmp/installer_input.txt
+
+
+  #- name: Unmount iso
+  #become: yes
+  #mount:
+  #  state=unmounted
+  #  path=/mnt/matlab_iso
+
+  #- name: Unmount smb share
+  #become: yes
+  #mount:
+  #  state=unmounted
+  #  path=/mnt/matlab_smb
+
+# TODO: remove mount directories here
+
+
