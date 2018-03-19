@@ -1,14 +1,7 @@
 ---
 
-- hosts: 405lab
-  roles:
-    - centos_rstudio
+- name: Configure 405 lab machine
+  hosts: 405lab
+  roles: centos_rstudio
 
-  vars_prompt:
-  - name: "p_username"
-    prompt: "Username for smb matlab directory:"
-    private: no
-  - name: "p_password"
-    prompt: "Password for smb-enabled user:"
-    private: yes
 
