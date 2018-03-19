@@ -1,7 +1,7 @@
 ---
 
-- name: Configure 405 lab machine
-  hosts: 405lab
-  roles: centos_rstudio
+- hosts: 405lab
+  roles:
+   - centos_rstudio
 
 
