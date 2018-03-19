@@ -2,7 +2,7 @@
 
 - hosts: testvm
   roles:
-    - centos_matlab
+    - centos_rstudio
 
   vars_prompt:
   - name: "p_username"
