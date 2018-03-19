@@ -1,6 +1,14 @@
 ---
 
-- hosts: 405lab
+- hosts: testvm
   roles:
-    - centos_rstudio
-    - centos_awips-cave
+    - centos_matlab
+
+  vars_prompt:
+  - name: "p_username"
+    prompt: "Username for smb matlab directory:"
+    private: no
+  - name: "p_password"
+    prompt: "Password for smb-enabled user:"
+    private: yes
+
